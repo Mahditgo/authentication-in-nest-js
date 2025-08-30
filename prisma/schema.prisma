@@ -11,9 +11,49 @@ datasource db {
 
 
 model User {
-  id       String     @id @default(uuid())
-  email    String     @unique
-  password String
-  name     String?
-  createdAt DateTime @default(now())
+  id          String        @id @default(uuid())
+  email       String        @unique
+  password    String
+  name        String?
+
+  // پیام‌هایی که کاربر ارسال کرده
+  messages    Message[]     @relation("UserMessages")
+
+  // پیام‌هایی که کاربر دریافت کرده
+  received    Message[]     @relation("PrivateMessages")
+
+  groupMembers GroupMember[]
+  createdAt   DateTime      @default(now())
+}
+
+model Group {
+  id        String           @id @default(uuid())
+  name      String
+  members   GroupMember[]
+  messages  Message[]     @relation("GroupMessages")
+}
+
+model GroupMember {
+  id      String   @id @default(uuid())
+  userId  String
+  groupId String
+  user    User  @relation(fields: [userId], references: [id])
+  group   Group @relation(fields: [groupId], references: [id])
+}
+
+model Message {
+  id        String       @id @default(uuid())
+  text      String
+  senderId  String
+  sender    User      @relation("UserMessages", fields: [senderId], references: [id])
+  
+  // برای گروه
+  groupId   String?      
+  group     Group?    @relation("GroupMessages", fields: [groupId], references: [id])
+
+  // برای PV
+  receiverId String?
+  receiver   User?    @relation("PrivateMessages", fields: [receiverId], references: [id])
+
+  createdAt DateTime  @default(now())
 }

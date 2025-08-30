@@ -39,4 +39,4 @@ export class AuthService {
     async validateUser(userId: string) {
     return this.databaseSercie.user.findUnique({ where: { id: userId } });
   }
-}
+} 
